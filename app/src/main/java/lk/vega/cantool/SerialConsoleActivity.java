@@ -70,6 +70,7 @@ public class SerialConsoleActivity extends Activity {
     private TextView mDumpTextView;
     private ScrollView mScrollView;
     private Spinner mSpinner;
+    private boolean initialized;
 
     private static final Integer[] BAUD_RATES = {300, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200};
     private int currentBaudRate = BAUD_RATES[BAUD_RATES.length - 1];
@@ -112,10 +113,15 @@ public class SerialConsoleActivity extends Activity {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                int sid = mSpinner.getSelectedItemPosition();
-                currentBaudRate = BAUD_RATES[sid];
-                /*closePort();
-                openPort();*/
+                if (!initialized) {
+                    mSpinner.setSelection(BAUD_RATES.length -1);
+                    initialized = true;
+                } else {
+                    int sid = mSpinner.getSelectedItemPosition();
+                    currentBaudRate = BAUD_RATES[sid];
+                    closePort();
+                    openPort();
+                }
                 Toast.makeText(getBaseContext(), "Baud rate set to " + currentBaudRate, Toast.LENGTH_SHORT).show();
             }
 
@@ -129,6 +135,11 @@ public class SerialConsoleActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        closePort();
+        finish();
+    }
+
+    private void closePort() {
         stopIoManager();
         if (sPort != null) {
             try {
@@ -136,29 +147,33 @@ public class SerialConsoleActivity extends Activity {
             } catch (IOException e) {
                 // Ignore.
             }
-            sPort = null;
+//            sPort = null;
         }
-        finish();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "Resumed, port=" + sPort);
+        openPort();
+    }
+
+    private void openPort() {
         if (sPort == null) {
             mTitleTextView.setText("No serial device.");
+            return;
+        }
+
+        final UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        UsbDeviceConnection connection = usbManager.openDevice(sPort.getDriver().getDevice());
+        if (connection == null) {
+            mTitleTextView.setText("Opening device failed");
         } else {
-            final UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-
-            UsbDeviceConnection connection = usbManager.openDevice(sPort.getDriver().getDevice());
-            if (connection == null) {
-                mTitleTextView.setText("Opening device failed");
-                return;
-            }
-
             try {
                 sPort.open(connection);
                 sPort.setParameters(currentBaudRate, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                mTitleTextView.setText("Serial device: " + sPort.getClass().getSimpleName());
+                onDeviceStateChange();
             } catch (IOException e) {
                 Log.e(TAG, "Error setting up device: " + e.getMessage(), e);
                 mTitleTextView.setText("Error opening device: " + e.getMessage());
@@ -167,12 +182,9 @@ public class SerialConsoleActivity extends Activity {
                 } catch (IOException e2) {
                     // Ignore.
                 }
-                sPort = null;
-                return;
+//                sPort = null;
             }
-            mTitleTextView.setText("Serial device: " + sPort.getClass().getSimpleName());
         }
-        onDeviceStateChange();
     }
 
     private void stopIoManager() {
