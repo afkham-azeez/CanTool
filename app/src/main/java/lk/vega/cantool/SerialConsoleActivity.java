@@ -28,7 +28,9 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -52,7 +54,7 @@ public class SerialConsoleActivity extends Activity {
     /**
      * Driver instance, passed in statically via
      * {@link #show(android.content.Context, UsbSerialPort)}.
-     *
+     * <p/>
      * <p/>
      * This is a devious hack; it'd be cleaner to re-create the driver using
      * arguments passed in with the {@link #startActivity(android.content.Intent)} intent. We
@@ -64,6 +66,10 @@ public class SerialConsoleActivity extends Activity {
     private TextView mTitleTextView;
     private TextView mDumpTextView;
     private ScrollView mScrollView;
+    private Spinner mSpinner;
+
+    private static final Integer[] BAUD_RATES = {300, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200};
+    private int currentBaudRate = BAUD_RATES[BAUD_RATES.length - 1];
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
 
@@ -72,21 +78,21 @@ public class SerialConsoleActivity extends Activity {
     private final SerialInputOutputManager.Listener mListener =
             new SerialInputOutputManager.Listener() {
 
-        @Override
-        public void onRunError(Exception e) {
-            Log.d(TAG, "Runner stopped.");
-        }
-
-        @Override
-        public void onNewData(final byte[] data) {
-            SerialConsoleActivity.this.runOnUiThread(new Runnable() {
                 @Override
-                public void run() {
-                    SerialConsoleActivity.this.updateReceivedData(data);
+                public void onRunError(Exception e) {
+                    Log.d(TAG, "Runner stopped.");
                 }
-            });
-        }
-    };
+
+                @Override
+                public void onNewData(final byte[] data) {
+                    SerialConsoleActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            SerialConsoleActivity.this.updateReceivedData(data);
+                        }
+                    });
+                }
+            };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,6 +101,10 @@ public class SerialConsoleActivity extends Activity {
         mTitleTextView = (TextView) findViewById(R.id.demoTitle);
         mDumpTextView = (TextView) findViewById(R.id.consoleText);
         mScrollView = (ScrollView) findViewById(R.id.demoScroller);
+        mSpinner = (Spinner) findViewById(R.id.baudRateSpinner);
+        ArrayAdapter<Integer> adapter =
+                new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, BAUD_RATES);
+        mSpinner.setAdapter(adapter);
     }
 
     @Override
@@ -129,8 +139,7 @@ public class SerialConsoleActivity extends Activity {
 
             try {
                 sPort.open(connection);
-//                sPort.setParameters(115200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
-                sPort.setParameters(38400, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
+                sPort.setParameters(currentBaudRate, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
             } catch (IOException e) {
                 Log.e(TAG, "Error setting up device: " + e.getMessage(), e);
                 mTitleTextView.setText("Error opening device: " + e.getMessage());
