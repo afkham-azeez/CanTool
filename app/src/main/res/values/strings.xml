@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CanTool</string>
+    <string name="refreshing">Refreshing...</string>
+    <string name="app_title">Vega CAN Tool</string>
+</resources>
