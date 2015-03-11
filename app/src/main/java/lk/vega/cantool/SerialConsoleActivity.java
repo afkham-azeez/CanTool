@@ -28,10 +28,13 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -105,6 +108,22 @@ public class SerialConsoleActivity extends Activity {
         ArrayAdapter<Integer> adapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, BAUD_RATES);
         mSpinner.setAdapter(adapter);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int sid = mSpinner.getSelectedItemPosition();
+                currentBaudRate = BAUD_RATES[sid];
+                /*closePort();
+                openPort();*/
+                Toast.makeText(getBaseContext(), "Baud rate set to " + currentBaudRate, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     @Override
@@ -188,7 +207,7 @@ public class SerialConsoleActivity extends Activity {
      * Starts the activity, using the supplied driver instance.
      *
      * @param context
-     * @param driver
+     * @param port
      */
     static void show(Context context, UsbSerialPort port) {
         sPort = port;
