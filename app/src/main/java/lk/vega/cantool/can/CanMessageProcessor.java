@@ -1,0 +1,51 @@
+/*
+ * (C) Copyright 2015 CodeGen International (http://codegen.net) and others.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl-2.1.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Afkham Azeez (afkham@gmail.com)
+ */
+package lk.vega.cantool.can;
+
+import java.util.Queue;
+
+/**
+ * TODO: Class comments
+ * <p/>
+ * Not thread safe
+ */
+public class CanMessageProcessor implements Runnable {
+
+    private static final int CAN_MSG_SIZE_BYTES = 10;
+    private byte[] overflow;
+    private Queue<byte[]> rawMsgQueue;
+    private Queue<CanMessage> canMessageQueue;
+
+    public CanMessageProcessor(Queue<byte[]> rawMsgQueue, Queue<CanMessage> canMessageQueue) {
+        this.rawMsgQueue = rawMsgQueue;
+        this.canMessageQueue = canMessageQueue;
+    }
+
+    @Override
+    public void run() {
+        /*byte[] content = new byte[]{0x01, 0x34, 0x56, 0x78, 0x09, (byte) 0xAB, (byte) 0xEF, (byte) 0xCA, (byte) 0xBC, 0x12};
+        canMessageQueue.add(new CanMessage(content));
+
+        content = new byte[]{0x01, 0x35, 0x56, 0x78, 0x09, (byte) 0xAB, (byte) 0xEF, (byte) 0xCA, (byte) 0xBC, 0x13};
+        canMessageQueue.add(new CanMessage(content));
+
+        content = new byte[]{0x01, 0x36, 0x56, 0x78, 0x09, (byte) 0xAB, (byte) 0xEF, (byte) 0xCA, (byte) 0xBC, 0x14};
+        canMessageQueue.add(new CanMessage(content));*/
+
+
+    }
+}

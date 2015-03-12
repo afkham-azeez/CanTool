@@ -37,9 +37,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import lk.vega.cantool.can.CanMessage;
+import lk.vega.cantool.can.CanMessagePrinter;
+import lk.vega.cantool.can.CanMessageProcessor;
 import lk.vega.usbserial.driver.UsbSerialPort;
 import lk.vega.usbserial.util.HexDump;
 import lk.vega.usbserial.util.SerialInputOutputManager;
@@ -71,11 +78,15 @@ public class SerialConsoleActivity extends Activity {
     private ScrollView mScrollView;
     private Spinner mSpinner;
     private boolean initialized;
+    private Queue<byte[]> rawMsgQueue = new LinkedBlockingQueue<>();
+    private Queue<CanMessage> canMsgQueue = new LinkedBlockingQueue<>();
 
     private static final Integer[] BAUD_RATES = {300, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200};
     private int currentBaudRate = BAUD_RATES[BAUD_RATES.length - 1];
 
-    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService serialIoExecutor = Executors.newSingleThreadExecutor();
+    private final ScheduledExecutorService msgQueueProcessorExecutor = Executors.newScheduledThreadPool(1);
+    private final ScheduledExecutorService canMessagePrinterExecutor = Executors.newScheduledThreadPool(1);
 
     private SerialInputOutputManager mSerialIoManager;
 
@@ -89,12 +100,15 @@ public class SerialConsoleActivity extends Activity {
 
                 @Override
                 public void onNewData(final byte[] data) {
-                    SerialConsoleActivity.this.runOnUiThread(new Runnable() {
+                    updateReceivedData(data);
+
+                    //TODO: Azeez - no need to run this on UI thread
+                    /*SerialConsoleActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             SerialConsoleActivity.this.updateReceivedData(data);
                         }
-                    });
+                    });*/
                 }
             };
 
@@ -110,7 +124,6 @@ public class SerialConsoleActivity extends Activity {
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, BAUD_RATES);
         mSpinner.setAdapter(adapter);
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!initialized) {
@@ -130,6 +143,8 @@ public class SerialConsoleActivity extends Activity {
 
             }
         });
+        msgQueueProcessorExecutor.scheduleWithFixedDelay(new CanMessageProcessor(rawMsgQueue, canMsgQueue), 0, 1000, TimeUnit.MILLISECONDS);
+        canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessagePrinter(canMsgQueue, this), 0, 2000, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -199,7 +214,7 @@ public class SerialConsoleActivity extends Activity {
         if (sPort != null) {
             Log.i(TAG, "Starting io manager ..");
             mSerialIoManager = new SerialInputOutputManager(sPort, mListener);
-            mExecutor.submit(mSerialIoManager);
+            serialIoExecutor.submit(mSerialIoManager);
         }
     }
 
@@ -209,10 +224,19 @@ public class SerialConsoleActivity extends Activity {
     }
 
     private void updateReceivedData(byte[] data) {
-        final String message = "Read " + data.length + " bytes: \n"
-                + HexDump.dumpHexString(data) + "\n\n";
-        mDumpTextView.append(message);
-        mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
+        rawMsgQueue.add(data);
+//        printHexDump(data); //TODO: remove this line after fixing CanMessageProcessor
+    }
+
+    public void printHexDump(final byte[] data) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final String message = HexDump.dumpHexString(data) + "\n\n";
+                mDumpTextView.append(message);
+                mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
+            }
+        });
     }
 
     /**
