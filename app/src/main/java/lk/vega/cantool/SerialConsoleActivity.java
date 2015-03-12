@@ -33,6 +33,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -107,6 +108,7 @@ public class SerialConsoleActivity extends Activity {
                     updateReceivedData(data);
                 }
             };
+    private boolean scanStarted;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -116,9 +118,11 @@ public class SerialConsoleActivity extends Activity {
         mDumpTextView = (TextView) findViewById(R.id.consoleText);
         mScrollView = (ScrollView) findViewById(R.id.demoScroller);
         mSpinner = (Spinner) findViewById(R.id.baudRateSpinner);
+        final Button startButton = (Button) findViewById(R.id.startButton);
         ArrayAdapter<Integer> adapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, BAUD_RATES);
         mSpinner.setAdapter(adapter);
+        mTitleTextView.setText("Serial device: " + sPort.getClass().getSimpleName());
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -136,16 +140,41 @@ public class SerialConsoleActivity extends Activity {
                     editor.putInt(BAUD_RATE_ITEM_POSITION_KEY, sid);
                     editor.apply();
                     closePort();
-                    openPort();
+                    scanStarted = false;
+                    startButton.setText(getResources().getString(R.string.start));
                 }
                 Toast.makeText(getBaseContext(), "Baud rate set to " + currentBaudRate, Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                // Nothing to do
             }
         });
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scanStarted = !scanStarted;
+                if (scanStarted) {
+                    startButton.setText(getResources().getString(R.string.stop));
+                    openPort();
+                    Toast.makeText(getBaseContext(), "Scan started", Toast.LENGTH_SHORT).show();
+                } else {
+                    startButton.setText(getResources().getString(R.string.start));
+                    closePort();
+                    Toast.makeText(getBaseContext(), "Scan stopped", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        final Button clearButton = (Button) findViewById(R.id.clearButton);
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDumpTextView.setText("");
+            }
+        });
+
         msgQueueProcessorExecutor.scheduleWithFixedDelay(new CanMessageProcessor(rawMsgQueue, canMsgQueue), 0, 1000, TimeUnit.MILLISECONDS);
         canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessagePrinter(canMsgQueue, this), 0, 2000, TimeUnit.MILLISECONDS);
     }
@@ -167,13 +196,6 @@ public class SerialConsoleActivity extends Activity {
             }
 //            sPort = null;
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "Resumed, port=" + sPort);
-        openPort();
     }
 
     private void openPort() {
