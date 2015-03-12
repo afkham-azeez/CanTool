@@ -17,7 +17,7 @@
 package lk.vega.cantool.can;
 
 /**
- * TODO: Class comments
+ * Representa a CAN message
  */
 public class CanMessage {
     private byte[] bytes;

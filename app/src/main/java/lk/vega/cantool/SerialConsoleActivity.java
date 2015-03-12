@@ -101,14 +101,6 @@ public class SerialConsoleActivity extends Activity {
                 @Override
                 public void onNewData(final byte[] data) {
                     updateReceivedData(data);
-
-                    //TODO: Azeez - no need to run this on UI thread
-                    /*SerialConsoleActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            SerialConsoleActivity.this.updateReceivedData(data);
-                        }
-                    });*/
                 }
             };
 
@@ -225,14 +217,13 @@ public class SerialConsoleActivity extends Activity {
 
     private void updateReceivedData(byte[] data) {
         rawMsgQueue.add(data);
-//        printHexDump(data); //TODO: remove this line after fixing CanMessageProcessor
     }
 
     public void printHexDump(final byte[] data) {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                final String message = HexDump.dumpHexString(data) + "\n\n";
+                final String message = HexDump.dumpHexString(data) + "\n";
                 mDumpTextView.append(message);
                 mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
             }

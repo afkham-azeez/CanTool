@@ -21,7 +21,7 @@ import java.util.Queue;
 import lk.vega.cantool.SerialConsoleActivity;
 
 /**
- * TODO: Class comments
+ * Prints CAN messages to the screen
  */
 public class CanMessagePrinter implements Runnable {
     private Queue<CanMessage> canMsgQueue;
