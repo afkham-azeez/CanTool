@@ -24,9 +24,11 @@ package lk.vega.cantool;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -59,6 +61,8 @@ import lk.vega.usbserial.util.SerialInputOutputManager;
  */
 public class SerialConsoleActivity extends Activity {
 
+    public static final String BAUD_RATE_KEY = "baudRate";
+    public static final String BAUD_RATE_ITEM_POSITION_KEY = "baudRateItemPosition";
     private final String TAG = SerialConsoleActivity.class.getSimpleName();
 
     /**
@@ -118,12 +122,19 @@ public class SerialConsoleActivity extends Activity {
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(SerialConsoleActivity.this);
                 if (!initialized) {
-                    mSpinner.setSelection(BAUD_RATES.length -1);
+                    currentBaudRate = preferences.getInt(BAUD_RATE_KEY, BAUD_RATES[BAUD_RATES.length - 1]);
+                    int sid = preferences.getInt(BAUD_RATE_ITEM_POSITION_KEY, BAUD_RATES.length - 1);
+                    mSpinner.setSelection(sid);
                     initialized = true;
                 } else {
                     int sid = mSpinner.getSelectedItemPosition();
                     currentBaudRate = BAUD_RATES[sid];
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putInt(BAUD_RATE_KEY, currentBaudRate);
+                    editor.putInt(BAUD_RATE_ITEM_POSITION_KEY, sid);
+                    editor.apply();
                     closePort();
                     openPort();
                 }
