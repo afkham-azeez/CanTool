@@ -169,7 +169,7 @@ public class DeviceListActivity extends Activity {
                 for (final UsbSerialDriver driver : drivers) {
                     final List<UsbSerialPort> ports = driver.getPorts();
                     Log.d(TAG, String.format("+ %s: %s port%s",
-                            driver, Integer.valueOf(ports.size()), ports.size() == 1 ? "" : "s"));
+                            driver, ports.size(), ports.size() == 1 ? "" : "s"));
                     result.addAll(ports);
                 }
 
@@ -182,7 +182,7 @@ public class DeviceListActivity extends Activity {
                 mEntries.addAll(result);
                 mAdapter.notifyDataSetChanged();
                 mProgressBarTitle.setText(
-                        String.format("%s device(s) found", Integer.valueOf(mEntries.size())));
+                        String.format("%s device(s) found", mEntries.size()));
                 hideProgressBar();
                 Log.d(TAG, "Done refreshing, " + mEntries.size() + " entries found.");
             }
