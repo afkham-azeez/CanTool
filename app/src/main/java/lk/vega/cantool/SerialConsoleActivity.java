@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
@@ -40,6 +41,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -84,6 +87,7 @@ public class SerialConsoleActivity extends Activity {
     private Spinner mSpinner;
     private Button mStartButton;
     private Button mClearButton;
+    private Button mEmailButton;
 
     private boolean initialized;
     private Queue<byte[]> rawMsgQueue = new LinkedBlockingQueue<>();
@@ -96,8 +100,9 @@ public class SerialConsoleActivity extends Activity {
     private final ScheduledExecutorService msgQueueProcessorExecutor = Executors.newScheduledThreadPool(1);
     private final ScheduledExecutorService canMessagePrinterExecutor = Executors.newScheduledThreadPool(1);
 
-    private SerialInputOutputManager mSerialIoManager;
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
 
+    private SerialInputOutputManager mSerialIoManager;
     private final SerialInputOutputManager.Listener mListener =
             new SerialInputOutputManager.Listener() {
 
@@ -123,15 +128,36 @@ public class SerialConsoleActivity extends Activity {
         mSpinner = (Spinner) findViewById(R.id.baudRateSpinner);
         mStartButton = (Button) findViewById(R.id.startButton);
         mClearButton = (Button) findViewById(R.id.clearButton);
+        mEmailButton = (Button) findViewById(R.id.shareButton);
 
         mTitleTextView.setText("Serial device: " + sPort.getClass().getSimpleName());
 
         initBaudRateSpinner();
         initStartButton();
         initClearButton();
+        initEmailButton();
 
-        msgQueueProcessorExecutor.scheduleWithFixedDelay(new CanMessageProcessor(rawMsgQueue, canMsgQueue), 0, 1000, TimeUnit.MILLISECONDS);
-        canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessagePrinter(canMsgQueue, this), 0, 2000, TimeUnit.MILLISECONDS);
+        msgQueueProcessorExecutor.scheduleWithFixedDelay(new CanMessageProcessor(rawMsgQueue, canMsgQueue), 0, 2, TimeUnit.MILLISECONDS);
+        canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessagePrinter(canMsgQueue, this), 0, 500, TimeUnit.MILLISECONDS);
+    }
+
+    private void initEmailButton() {
+        mEmailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String data = mDumpTextView.getText().toString();
+                if (data != null && !data.isEmpty()) {
+                    String shareBody = "Device: " + sPort.getClass().getSimpleName() + "\n\n" + "Data\n" + data;
+                    Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                    sharingIntent.setType("text/plain");
+                    sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Vega CAN data [" + dateFormat.format(new Date()) + "]");
+                    sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                    startActivity(sharingIntent);
+                } else {
+                    Toast.makeText(getBaseContext(), "Nothing to share", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void initClearButton() {
@@ -150,10 +176,12 @@ public class SerialConsoleActivity extends Activity {
                 scanStarted = !scanStarted;
                 if (scanStarted) {
                     mStartButton.setText(getResources().getString(R.string.stop));
+                    mStartButton.setBackgroundColor(Color.RED);
                     openPort();
                     Toast.makeText(getBaseContext(), "Scan started", Toast.LENGTH_SHORT).show();
                 } else {
                     mStartButton.setText(getResources().getString(R.string.start));
+                    mStartButton.setBackgroundColor(Color.rgb(0xa4, 0xc6, 0x39));
                     closePort();
                     Toast.makeText(getBaseContext(), "Scan stopped", Toast.LENGTH_SHORT).show();
                 }
@@ -272,7 +300,7 @@ public class SerialConsoleActivity extends Activity {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                final String message = HexDump.dumpHexString(data) + "\n";
+                final String message = HexDump.dumpHexString(data);
                 mDumpTextView.append(message);
                 mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
             }

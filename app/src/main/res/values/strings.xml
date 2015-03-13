@@ -1,9 +1,10 @@
 <resources>
-    <string name="app_name">CanTool</string>
+    <string name="app_name">Vega CAN Tool</string>
     <string name="refreshing">Refreshing...</string>
     <string name="app_title">Vega CAN Tool</string>
     <string name="baud_rate">Baud rate:</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
     <string name="clear">Clear</string>
+    <string name="share">Share</string>
 </resources>
