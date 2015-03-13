@@ -63,7 +63,7 @@
             android:layout_height="match_parent"
             android:text="@string/baud_rate"
             android:textSize="24sp"
-            android:gravity="end"/>
+            android:gravity="center_vertical"/>
         <Space
             android:layout_width="10dp"
             android:layout_height="match_parent"/>

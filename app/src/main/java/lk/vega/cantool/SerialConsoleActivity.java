@@ -137,8 +137,8 @@ public class SerialConsoleActivity extends Activity {
         initClearButton();
         initEmailButton();
 
-        msgQueueProcessorExecutor.scheduleWithFixedDelay(new CanMessageProcessor(rawMsgQueue, canMsgQueue), 0, 2, TimeUnit.MILLISECONDS);
-        canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessagePrinter(canMsgQueue, this), 0, 500, TimeUnit.MILLISECONDS);
+        msgQueueProcessorExecutor.scheduleWithFixedDelay(new CanMessageProcessor(rawMsgQueue, canMsgQueue), 0, 1, TimeUnit.MILLISECONDS);
+        canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessagePrinter(canMsgQueue, this), 0, 250, TimeUnit.MILLISECONDS);
     }
 
     private void initEmailButton() {
