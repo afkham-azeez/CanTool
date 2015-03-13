@@ -54,7 +54,17 @@
             android:layout_height="match_parent"
             android:text="@string/share"/>
         <Space
-            android:layout_width="150dp"
+            android:layout_width="25dp"
+            android:layout_height="match_parent"/>
+
+        <Button
+            android:id="@+id/rawCanButton"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:text="@string/can"/>
+
+        <Space
+            android:layout_width="50dp"
             android:layout_height="match_parent"/>
 
         <TextView
@@ -103,5 +113,37 @@
         </ScrollView>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/canMsgLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/can_msg"
+            android:textSize="24sp"
+            android:gravity="center_vertical"/>
+        <Space
+            android:layout_width="30dp"
+            android:layout_height="match_parent"/>
+        <EditText
+            android:id="@+id/canMsg"
+            android:labelFor="@id/canMsgLabel"
+            android:layout_width="300dp"
+            android:digits="0123456789ABCDEF"
+            android:inputType="textCapCharacters"
+            android:imeOptions="actionSend"
+            android:layout_height="match_parent"
+            android:maxLength="20"/>
+        <Button
+            android:id="@+id/sendCanMsg"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:text="@string/Send"/>
+
+        </LinearLayout>
 
 </LinearLayout>

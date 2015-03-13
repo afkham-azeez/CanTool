@@ -35,6 +35,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -87,9 +88,14 @@ public class SerialConsoleActivity extends Activity {
     private Spinner mSpinner;
     private Button mStartButton;
     private Button mClearButton;
+    private Button mRawCanButton;
     private Button mEmailButton;
+    private Button mSendCanMsgButton;
+    private EditText mCanMsgEditView;
 
     private boolean initialized;
+    private boolean isCanView = true;
+
     private Queue<byte[]> rawMsgQueue = new LinkedBlockingQueue<>();
     private Queue<CanMessage> canMsgQueue = new LinkedBlockingQueue<>();
 
@@ -128,17 +134,52 @@ public class SerialConsoleActivity extends Activity {
         mSpinner = (Spinner) findViewById(R.id.baudRateSpinner);
         mStartButton = (Button) findViewById(R.id.startButton);
         mClearButton = (Button) findViewById(R.id.clearButton);
+        mRawCanButton = (Button) findViewById(R.id.rawCanButton);
         mEmailButton = (Button) findViewById(R.id.shareButton);
+        mSendCanMsgButton = (Button) findViewById(R.id.sendCanMsg);
+        mCanMsgEditView = (EditText) findViewById(R.id.canMsg);
 
         mTitleTextView.setText("Serial device: " + sPort.getClass().getSimpleName());
 
         initBaudRateSpinner();
         initStartButton();
         initClearButton();
+        initRawCanButton();
         initEmailButton();
+        initSendCanMsgButton();
 
         msgQueueProcessorExecutor.scheduleWithFixedDelay(new CanMessageProcessor(rawMsgQueue, canMsgQueue), 0, 1, TimeUnit.MILLISECONDS);
         canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessagePrinter(canMsgQueue, this), 0, 250, TimeUnit.MILLISECONDS);
+    }
+
+    private void initRawCanButton() {
+        mRawCanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isCanView = !isCanView;
+                if (isCanView) {
+                    mRawCanButton.setText(getResources().getString(R.string.can));
+//                    mRawCanButton.setBackgroundColor(Color.RED);
+                    Toast.makeText(getBaseContext(), "Format set to CAN", Toast.LENGTH_SHORT).show();
+                } else {
+                    mRawCanButton.setText(getResources().getString(R.string.raw));
+//                    mRawCanButton.setBackgroundColor(Color.rgb(0xa4, 0xc6, 0x39));
+                    Toast.makeText(getBaseContext(), "Format set to Raw", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void initSendCanMsgButton() {
+        mSendCanMsgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String canMsg = mCanMsgEditView.getText().toString();
+                if(!canMsg.isEmpty()){
+//                    mSerialIoManager.writeAsync(canMsg.getBytes());
+                }
+            }
+        });
     }
 
     private void initEmailButton() {
@@ -293,7 +334,11 @@ public class SerialConsoleActivity extends Activity {
     }
 
     private void updateReceivedData(byte[] data) {
-        rawMsgQueue.add(data);
+        if (isCanView) {
+            rawMsgQueue.add(data);
+        } else {
+            printHexDump(data);
+        }
     }
 
     public void printHexDump(final byte[] data) {
