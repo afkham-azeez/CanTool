@@ -176,7 +176,10 @@ public class SerialConsoleActivity extends Activity {
             public void onClick(View v) {
                 String canMsg = mCanMsgEditView.getText().toString();
                 if(!canMsg.isEmpty()){
-//                    mSerialIoManager.writeAsync(canMsg.getBytes());
+                    if (mSerialIoManager != null) {
+                        mSerialIoManager.writeAsync(canMsg.getBytes());
+                        Toast.makeText(getBaseContext(), "CAN message [" + canMsg + "] sent", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
