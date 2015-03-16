@@ -177,7 +177,7 @@ public class SerialConsoleActivity extends Activity {
                 String canMsg = mCanMsgEditView.getText().toString();
                 if(!canMsg.isEmpty()){
                     if (mSerialIoManager != null) {
-                        mSerialIoManager.writeAsync(canMsg.getBytes());
+                        mSerialIoManager.writeAsync(HexDump.hexStringToByteArray(canMsg));
                         Toast.makeText(getBaseContext(), "CAN message [" + canMsg + "] sent", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -348,8 +348,8 @@ public class SerialConsoleActivity extends Activity {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                final String message = HexDump.dumpHexString(data);
-                mDumpTextView.append(message);
+                final String message = HexDump.toHexString(data);
+                mDumpTextView.append(message + "\n");
                 mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
             }
         });
