@@ -147,12 +147,12 @@
             android:id="@+id/sendCanMsg"
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:text="@string/Send"/>
+            android:text="@string/send"/>
         <Button
             android:id="@+id/canSync"
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:text="@string/Sync"/>
+            android:text="@string/sync"/>
 
         </LinearLayout>
         <Space
