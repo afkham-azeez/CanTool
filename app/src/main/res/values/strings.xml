@@ -7,9 +7,9 @@
     <string name="stop">Stop</string>
     <string name="clear">Clear</string>
     <string name="share">Share</string>
-    <string name="Send">Send</string>
+    <string name="send">Send</string>
     <string name="can_msg">CAN Message</string>
     <string name="can">CAN</string>
     <string name="raw">Raw</string>
-    <string name="Sync">Sync</string>
+    <string name="sync">Sync</string>
 </resources>
