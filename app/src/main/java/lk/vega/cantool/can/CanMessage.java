@@ -31,8 +31,7 @@ public class CanMessage {
     public CanMessage(byte[] raw) {
         this.raw = raw;
         messageId = new byte[CAN_MSG_ID_SIZE_BYTES];
-        messageId[0] = raw[0];
-        messageId[1] = raw[1];
+        System.arraycopy(raw, 0, messageId, 0, CAN_MSG_ID_SIZE_BYTES);
 
         data = new byte[CAN_MSG_SIZE_BYTES - CAN_MSG_ID_SIZE_BYTES];
         System.arraycopy(raw, CAN_MSG_ID_SIZE_BYTES, data, 0, CAN_MSG_SIZE_BYTES - CAN_MSG_ID_SIZE_BYTES);

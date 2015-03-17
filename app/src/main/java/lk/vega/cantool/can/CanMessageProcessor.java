@@ -56,6 +56,12 @@ public class CanMessageProcessor implements Runnable {
         } while (rawMsg != null);
     }
 
+    public void reset(){
+        overflow = null;
+        rawMsgQueue.clear();
+        canMessageQueue.clear();
+    }
+
     private void process(byte[] rawMsg) {
         if (overflow == null) { // there was no overflow from the previous round
             if (rawMsg.length < CAN_MSG_SIZE_BYTES) {

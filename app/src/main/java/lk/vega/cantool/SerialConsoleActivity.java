@@ -29,19 +29,15 @@ import android.graphics.Color;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -95,6 +91,7 @@ public class SerialConsoleActivity extends Activity {
     private Button mRawCanButton;
     private Button mEmailButton;
     private Button mSendCanMsgButton;
+    private Button mCanSyncButton;
     private EditText mCanMsgEditView;
 
     private boolean initialized;
@@ -111,6 +108,8 @@ public class SerialConsoleActivity extends Activity {
     private final ScheduledExecutorService canMessagePrinterExecutor = Executors.newScheduledThreadPool(1);
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+    private CanMessageProcessor canMessageProcessor;
+
 
     private SerialInputOutputManager mSerialIoManager;
     private final SerialInputOutputManager.Listener mListener =
@@ -141,6 +140,7 @@ public class SerialConsoleActivity extends Activity {
         mRawCanButton = (Button) findViewById(R.id.rawCanButton);
         mEmailButton = (Button) findViewById(R.id.shareButton);
         mSendCanMsgButton = (Button) findViewById(R.id.sendCanMsg);
+        mCanSyncButton = (Button) findViewById(R.id.canSync);
         mCanMsgEditView = (EditText) findViewById(R.id.canMsg);
 
         mTitleTextView.setText("Serial device: " + sPort.getClass().getSimpleName());
@@ -151,8 +151,10 @@ public class SerialConsoleActivity extends Activity {
         initRawCanButton();
         initEmailButton();
         initSendCanMsgButton();
+        initSendCanSyncButton();
 
-        msgQueueProcessorExecutor.scheduleWithFixedDelay(new CanMessageProcessor(rawMsgQueue, canMsgQueue), 0, 1, TimeUnit.MILLISECONDS);
+        canMessageProcessor = new CanMessageProcessor(rawMsgQueue, canMsgQueue);
+        msgQueueProcessorExecutor.scheduleWithFixedDelay(canMessageProcessor, 0, 1, TimeUnit.MILLISECONDS);
         canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessagePrinter(canMsgQueue, this), 0, 250, TimeUnit.MILLISECONDS);
     }
 
@@ -163,13 +165,28 @@ public class SerialConsoleActivity extends Activity {
                 isCanView = !isCanView;
                 if (isCanView) {
                     mRawCanButton.setText(getResources().getString(R.string.can));
-//                    mRawCanButton.setBackgroundColor(Color.RED);
+                    mRawCanButton.setBackgroundColor(Color.rgb(0xa4, 0xc6, 0x39));
                     Toast.makeText(getBaseContext(), "Format set to CAN", Toast.LENGTH_SHORT).show();
                 } else {
                     mRawCanButton.setText(getResources().getString(R.string.raw));
-//                    mRawCanButton.setBackgroundColor(Color.rgb(0xa4, 0xc6, 0x39));
+                    mRawCanButton.setBackgroundColor(Color.RED);
                     Toast.makeText(getBaseContext(), "Format set to Raw", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+    }
+
+    private void initSendCanSyncButton() {
+        mCanSyncButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mClearButton.callOnClick();
+                canMessageProcessor.reset();
+                if (mSerialIoManager == null) {
+                    mStartButton.callOnClick();
+                }
+                mSerialIoManager.writeAsync(HexDump.hexStringToByteArray(CanToolConstants.CAN_HANDSHAKE));
+                Toast.makeText(getBaseContext(), "Sync successful", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -179,12 +196,16 @@ public class SerialConsoleActivity extends Activity {
             @Override
             public void onClick(View v) {
                 String canMsg = mCanMsgEditView.getText().toString();
-                if (!canMsg.isEmpty()) {
+                if (!canMsg.isEmpty() && canMsg.length() == CanMessage.CAN_MSG_SIZE_BYTES * 2) {
                     if (mSerialIoManager == null) {
                         mStartButton.callOnClick();
                     }
                     mSerialIoManager.writeAsync(HexDump.hexStringToByteArray(canMsg));
                     Toast.makeText(getBaseContext(), "CAN message [" + canMsg + "] sent", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getBaseContext(),
+                            "Invalid CAN message length [" + canMsg.length() + "]. CAN message size is " + CanMessage.CAN_MSG_SIZE_BYTES + " bytes",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -227,9 +248,8 @@ public class SerialConsoleActivity extends Activity {
                     mStartButton.setText(getResources().getString(R.string.stop));
                     mStartButton.setBackgroundColor(Color.RED);
                     openPort();
-                    SystemClock.sleep(500);
                     // Send handshake
-                    mSerialIoManager.writeAsync(HexDump.hexStringToByteArray("0D"));
+//                    mSerialIoManager.writeAsync(HexDump.hexStringToByteArray(CanToolConstants.CAN_HANDSHAKE));
                     Toast.makeText(getBaseContext(), "Scan started", Toast.LENGTH_SHORT).show();
                 } else {
                     mStartButton.setText(getResources().getString(R.string.start));
@@ -364,6 +384,18 @@ public class SerialConsoleActivity extends Activity {
     }
 
     public void printCanMessage(final CanMessage canMessage) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final String message = HexDump.toHexString(canMessage.getMessageId()) + "    " +
+                        HexDump.toHexString(canMessage.getData());
+                mDumpTextView.append(message + "\n");
+                mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
+            }
+        });
+    }
+
+//    public void printCanMessage(final CanMessage canMessage) {
         /*this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -397,7 +429,7 @@ public class SerialConsoleActivity extends Activity {
                 tr.addView(canId);
             }
         });*/
-    }
+//    }
 
     /**
      * Starts the activity, using the supplied driver instance.
