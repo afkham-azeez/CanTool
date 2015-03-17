@@ -100,7 +100,7 @@
             android:background="#eeeeee"/>
 
         <ScrollView
-            android:id="@+id/demoScroller"
+            android:id="@+id/canDataScroller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 

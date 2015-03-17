@@ -29,15 +29,19 @@ import android.graphics.Color;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -130,7 +134,7 @@ public class SerialConsoleActivity extends Activity {
         setContentView(R.layout.serial_console);
         mTitleTextView = (TextView) findViewById(R.id.demoTitle);
         mDumpTextView = (TextView) findViewById(R.id.consoleText);
-        mScrollView = (ScrollView) findViewById(R.id.demoScroller);
+        mScrollView = (ScrollView) findViewById(R.id.canDataScroller);
         mSpinner = (Spinner) findViewById(R.id.baudRateSpinner);
         mStartButton = (Button) findViewById(R.id.startButton);
         mClearButton = (Button) findViewById(R.id.clearButton);
@@ -223,6 +227,9 @@ public class SerialConsoleActivity extends Activity {
                     mStartButton.setText(getResources().getString(R.string.stop));
                     mStartButton.setBackgroundColor(Color.RED);
                     openPort();
+                    SystemClock.sleep(500);
+                    // Send handshake
+                    mSerialIoManager.writeAsync(HexDump.hexStringToByteArray("0D"));
                     Toast.makeText(getBaseContext(), "Scan started", Toast.LENGTH_SHORT).show();
                 } else {
                     mStartButton.setText(getResources().getString(R.string.start));
@@ -354,6 +361,42 @@ public class SerialConsoleActivity extends Activity {
                 mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
             }
         });
+    }
+
+    public void printCanMessage(final CanMessage canMessage) {
+        /*this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Get the TableLayout
+                TableLayout tl = (TableLayout) findViewById(R.id.canDataTable);
+
+                // Create a TableRow and give it an ID
+                TableRow tr = new TableRow(SerialConsoleActivity.this);
+                tr.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                // Create a TextView to show CAN message ID
+                updateCanData(tr, canMessage.getMessageId());
+
+                // Create a TextView to show CAN message data
+                updateCanData(tr, canMessage.getData());
+
+                // Create a TextView to show the raw CAN message
+                updateCanData(tr, canMessage.getRaw());
+
+                // Add the TableRow to the TableLayout
+                tl.addView(tr, new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+//                mScrollView.smoothScrollTo(0, mDumpTextView.getBottom());
+            }
+
+            private void updateCanData(TableRow tr, byte[] data) {
+                TextView canId = new TextView(SerialConsoleActivity.this);
+                canId.setText(HexDump.toHexString(data));
+//                canId.setTextColor(Color.BLACK);
+                canId.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                tr.addView(canId);
+            }
+        });*/
     }
 
     /**

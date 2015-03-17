@@ -37,7 +37,8 @@ public class CanMessagePrinter implements Runnable {
         CanMessage canMessage = null;
         do {
             if (canMessage != null) {
-                serialConsoleActivity.printHexDump(canMessage.getBytes());
+//                serialConsoleActivity.printCanMessage(canMessage);
+                serialConsoleActivity.printHexDump(canMessage.getRaw());
             }
             canMessage = canMsgQueue.poll();
         } while (canMessage != null);

@@ -18,6 +18,7 @@ package lk.vega.cantool.can;
 
 import java.util.Arrays;
 import java.util.Queue;
+import static lk.vega.cantool.can.CanMessage.CAN_MSG_SIZE_BYTES;
 
 /**
  * Processes byte[] raw messages and creates {@link lk.vega.cantool.can.CanMessage}s
@@ -26,7 +27,6 @@ import java.util.Queue;
  */
 public class CanMessageProcessor implements Runnable {
 
-    private static final int CAN_MSG_SIZE_BYTES = 10;
     private byte[] overflow;
     private Queue<byte[]> rawMsgQueue;
     private Queue<CanMessage> canMessageQueue;
@@ -75,6 +75,7 @@ public class CanMessageProcessor implements Runnable {
                 } while (rawMsg.length > CAN_MSG_SIZE_BYTES);
             }
         } else { // there was an overflow from the previous round
+            // Append the overflow to the bytes from the new message, and recursively call process(byte[])
             byte[] newRawMsg = new byte[overflow.length + rawMsg.length];
             System.arraycopy(overflow, 0, newRawMsg, 0, overflow.length);
             System.arraycopy(rawMsg, 0, newRawMsg, overflow.length, rawMsg.length);

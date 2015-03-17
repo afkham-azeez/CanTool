@@ -17,16 +17,36 @@
 package lk.vega.cantool.can;
 
 /**
- * Representa a CAN message
+ * Represents a CAN message
  */
 public class CanMessage {
-    private byte[] bytes;
+    public static final int CAN_MSG_SIZE_BYTES = 10;
+    public static final int CAN_MSG_ID_SIZE_BYTES = 2;
 
-    public CanMessage(byte[] bytes) {
-        this.bytes = bytes;
+    private byte[] messageId;
+    private byte[] data;
+
+    private byte[] raw;
+
+    public CanMessage(byte[] raw) {
+        this.raw = raw;
+        messageId = new byte[CAN_MSG_ID_SIZE_BYTES];
+        messageId[0] = raw[0];
+        messageId[1] = raw[1];
+
+        data = new byte[CAN_MSG_SIZE_BYTES - CAN_MSG_ID_SIZE_BYTES];
+        System.arraycopy(raw, CAN_MSG_ID_SIZE_BYTES, data, 0, CAN_MSG_SIZE_BYTES - CAN_MSG_ID_SIZE_BYTES);
     }
 
-    public byte[] getBytes() {
-        return bytes;
+    public byte[] getRaw() {
+        return raw;
+    }
+
+    public byte[] getMessageId() {
+        return messageId;
+    }
+
+    public byte[] getData() {
+        return data;
     }
 }
