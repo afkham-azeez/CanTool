@@ -14,15 +14,11 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool;
+package lk.vega.cantool.can;
 
 /**
- * Constants
+ * TODO: Class comments
  */
-public class CanToolConstants {
+public enum VegaCanMessageId {
 
-    /**
-     * The message sent during handshaking
-     */
-    public static final String CAN_HANDSHAKE = "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD";
 }

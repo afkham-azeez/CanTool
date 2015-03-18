@@ -54,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 import lk.vega.cantool.can.CanMessage;
 import lk.vega.cantool.can.CanMessagePrinter;
 import lk.vega.cantool.can.CanMessageProcessor;
+import lk.vega.cantool.can.CanConstants;
 import lk.vega.usbserial.driver.UsbSerialPort;
 import lk.vega.usbserial.util.HexDump;
 import lk.vega.usbserial.util.SerialInputOutputManager;
@@ -182,10 +183,11 @@ public class SerialConsoleActivity extends Activity {
             public void onClick(View v) {
                 mClearButton.callOnClick();
                 canMessageProcessor.reset();
+                canMessageProcessor.setWaitingForSyncAck(true);
                 if (mSerialIoManager == null) {
                     mStartButton.callOnClick();
                 }
-                mSerialIoManager.writeAsync(HexDump.hexStringToByteArray(CanToolConstants.CAN_HANDSHAKE));
+                mSerialIoManager.writeAsync(HexDump.hexStringToByteArray(CanConstants.CAN_SYNC));
                 Toast.makeText(getBaseContext(), "Sync successful", Toast.LENGTH_SHORT).show();
             }
         });
@@ -249,7 +251,7 @@ public class SerialConsoleActivity extends Activity {
                     mStartButton.setBackgroundColor(Color.RED);
                     openPort();
                     // Send handshake
-//                    mSerialIoManager.writeAsync(HexDump.hexStringToByteArray(CanToolConstants.CAN_HANDSHAKE));
+//                    mSerialIoManager.writeAsync(HexDump.hexStringToByteArray(CanConstants.CAN_SYNC));
                     Toast.makeText(getBaseContext(), "Scan started", Toast.LENGTH_SHORT).show();
                 } else {
                     mStartButton.setText(getResources().getString(R.string.start));

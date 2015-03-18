@@ -18,6 +18,9 @@ package lk.vega.cantool.can;
 
 import java.util.Arrays;
 import java.util.Queue;
+
+import lk.vega.usbserial.util.HexDump;
+
 import static lk.vega.cantool.can.CanMessage.CAN_MSG_SIZE_BYTES;
 
 /**
@@ -28,8 +31,15 @@ import static lk.vega.cantool.can.CanMessage.CAN_MSG_SIZE_BYTES;
 public class CanMessageProcessor implements Runnable {
 
     private byte[] overflow;
+
+    /**
+     * The time we started waiting to receive the rest of the message
+     */
+    private long waitStartForRestOfMsg = -1;
+
     private Queue<byte[]> rawMsgQueue;
     private Queue<CanMessage> canMessageQueue;
+    private boolean waitingForSyncAck;
 
     public CanMessageProcessor(Queue<byte[]> rawMsgQueue, Queue<CanMessage> canMessageQueue) {
         this.rawMsgQueue = rawMsgQueue;
@@ -56,6 +66,11 @@ public class CanMessageProcessor implements Runnable {
         } while (rawMsg != null);
     }
 
+    public void setWaitingForSyncAck(boolean waitingForSyncAck) {
+        this.waitingForSyncAck = waitingForSyncAck;
+        reset();
+    }
+
     public void reset(){
         overflow = null;
         rawMsgQueue.clear();
@@ -63,9 +78,19 @@ public class CanMessageProcessor implements Runnable {
     }
 
     private void process(byte[] rawMsg) {
+        if(waitingForSyncAck){
+            if(HexDump.toHexString(rawMsg).contains(CanConstants.CAN_SYNC_ACK)){
+                waitingForSyncAck = false;
+            }
+            return;
+        }
+        if(System.currentTimeMillis() - waitStartForRestOfMsg > 250){
+            overflow = null;
+        }
         if (overflow == null) { // there was no overflow from the previous round
             if (rawMsg.length < CAN_MSG_SIZE_BYTES) {
                 overflow = Arrays.copyOf(rawMsg, rawMsg.length);
+                waitStartForRestOfMsg = System.currentTimeMillis();
             } else {
                 do {
                     // loop until all msgs are retrieved
@@ -77,6 +102,7 @@ public class CanMessageProcessor implements Runnable {
                     if (rawMsg.length < CAN_MSG_SIZE_BYTES) {
                         // overflow
                         overflow = Arrays.copyOf(rawMsg, rawMsg.length);
+                        waitStartForRestOfMsg = System.currentTimeMillis();
                     }
                 } while (rawMsg.length > CAN_MSG_SIZE_BYTES);
             }
@@ -87,8 +113,10 @@ public class CanMessageProcessor implements Runnable {
             System.arraycopy(rawMsg, 0, newRawMsg, overflow.length, rawMsg.length);
             if (newRawMsg.length < CAN_MSG_SIZE_BYTES) {
                 overflow = newRawMsg;
+                waitStartForRestOfMsg = System.currentTimeMillis();
             } else {
                 overflow = null;
+                waitStartForRestOfMsg = -1;
                 process(newRawMsg);
             }
         }
