@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import lk.vega.usbserial.util.HexDump;
+
 /**
  * TODO: Class comments
  */
@@ -71,7 +73,7 @@ public class CanMessageTemplateDB {
                         String name = parser.getAttributeValue("", "name");
                         String description = parser.getAttributeValue("", "description");
                         String id = parser.getAttributeValue("", "id");
-                        template = new CanMessageTemplate(id.getBytes(), name, description);
+                        template = new CanMessageTemplate(HexDump.hexStringToByteArray(id), name, description);
                     }
                     /*else if (currentProduct != null) {
                         if (tagName == "productname") {
