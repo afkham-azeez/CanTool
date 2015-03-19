@@ -75,15 +75,6 @@ public class CanMessageTemplateDB {
                         String id = parser.getAttributeValue("", "id");
                         template = new CanMessageTemplate(HexDump.hexStringToByteArray(id), name, description);
                     }
-                    /*else if (currentProduct != null) {
-                        if (tagName == "productname") {
-                            currentProduct.name = parser.nextText();
-                        } else if (tagName == "productcolor") {
-                            currentProduct.color = parser.nextText();
-                        } else if (tagName == "productquantity") {
-                            currentProduct.quantity = parser.nextText();
-                        }
-                    }*/
                     break;
                 case XmlPullParser.END_TAG:
                     tagName = parser.getName();
