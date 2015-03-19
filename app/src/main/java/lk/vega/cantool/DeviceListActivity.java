@@ -41,9 +41,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TwoLineListItem;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import lk.vega.cantool.can.CanMessageTemplateDB;
 import lk.vega.usbserial.driver.UsbSerialDriver;
 import lk.vega.usbserial.driver.UsbSerialPort;
 import lk.vega.usbserial.driver.UsbSerialProber;
@@ -89,6 +94,8 @@ public class DeviceListActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        CanMessageTemplateDB.parse(this);
 
         mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         mListView = (ListView) findViewById(R.id.deviceList);
