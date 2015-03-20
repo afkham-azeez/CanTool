@@ -19,7 +19,7 @@ package lk.vega.cantool.can;
 import java.util.Queue;
 
 /**
- * TODO: Class comments
+ * Handles receiving CAN messages and dispatching those messages to the respective CanMessageProcessors
  */
 public class CanMessageManager implements Runnable {
     private final Queue<CanMessage> canMsgQueue;
@@ -33,6 +33,9 @@ public class CanMessageManager implements Runnable {
         if(template != null){
             template.getProcessor().process(canMessage);
         }
+
+        // If there is a CanMessageProcessor that is interested in handling all CAN messages, then we dispatch to
+        // such a processor as well
         CanMessageTemplate allMessagesTemplate = CanMessageTemplateDB.getTemplate(CanConstants.ALL_MESSAGES);
         if(allMessagesTemplate != null){
             allMessagesTemplate.getProcessor().process(canMessage);

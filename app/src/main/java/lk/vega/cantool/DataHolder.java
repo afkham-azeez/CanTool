@@ -17,7 +17,7 @@
 package lk.vega.cantool;
 
 /**
- * TODO: Class comments
+ * Singleton class for storing data
  */
 public class DataHolder {
     private static final DataHolder instance = new DataHolder();

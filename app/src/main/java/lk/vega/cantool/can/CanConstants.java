@@ -24,9 +24,7 @@ public class CanConstants {
     /**
      * The message sent during handshaking
      */
-//    public static final String CAN_SYNC = "DD";
-    public static final String CAN_SYNC = "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD";
-
+    public static final String CAN_SYNC = "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"; // 15 bytes
 
     /**
      * ACK for the CAN sync handshake message

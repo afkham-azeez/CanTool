@@ -21,7 +21,7 @@ import android.util.Log;
 import lk.vega.cantool.can.messages.CanMessageProcessor;
 
 /**
- * TODO: Class comments
+ * Represents the template for a CAN message
  */
 public class CanMessageTemplate {
 

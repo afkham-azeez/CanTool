@@ -31,7 +31,8 @@ import java.util.Map;
 import lk.vega.usbserial.util.HexDump;
 
 /**
- * TODO: Class comments
+ * This class loads all the CAN message types that are supported by the system & is used as a central DB for keeping
+ * all the templates for the CAN message types
  */
 public class CanMessageTemplateDB {
 
