@@ -14,24 +14,16 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can;
+package lk.vega.cantool.can.messages;
+
+import lk.vega.cantool.can.CanMessage;
 
 /**
- * Constants
+ * TODO: Class comments
  */
-public class CanConstants {
+public class BrakeControlMsgProcessor implements CanMessageProcessor {
+    @Override
+    public void process(CanMessage canMessage) {
 
-    /**
-     * The message sent during handshaking
-     */
-//    public static final String CAN_SYNC = "DD";
-    public static final String CAN_SYNC = "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD";
-
-
-    /**
-     * ACK for the CAN sync handshake message
-     */
-    public static final String CAN_SYNC_ACK = "DDDDDD";
-
-    public static final String ALL_MESSAGES = "*";
+    }
 }

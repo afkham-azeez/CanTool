@@ -52,8 +52,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lk.vega.cantool.can.CanMessage;
-import lk.vega.cantool.can.CanMessagePrinter;
-import lk.vega.cantool.can.CanMessageProcessor;
+import lk.vega.cantool.can.CanMessageBuilder;
+import lk.vega.cantool.can.CanMessageManager;
+import lk.vega.cantool.can.messages.CanMessagePrinter;
 import lk.vega.cantool.can.CanConstants;
 import lk.vega.usbserial.driver.UsbSerialPort;
 import lk.vega.usbserial.util.HexDump;
@@ -109,8 +110,7 @@ public class SerialConsoleActivity extends Activity {
     private final ScheduledExecutorService canMessagePrinterExecutor = Executors.newScheduledThreadPool(1);
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-    private CanMessageProcessor canMessageProcessor;
-
+    private CanMessageBuilder canMessageBuilder;
 
     private SerialInputOutputManager mSerialIoManager;
     private final SerialInputOutputManager.Listener mListener =
@@ -154,9 +154,11 @@ public class SerialConsoleActivity extends Activity {
         initSendCanMsgButton();
         initSendCanSyncButton();
 
-        canMessageProcessor = new CanMessageProcessor(rawMsgQueue, canMsgQueue);
-        msgQueueProcessorExecutor.scheduleWithFixedDelay(canMessageProcessor, 0, 1, TimeUnit.MILLISECONDS);
-        canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessagePrinter(canMsgQueue, this), 0, 250, TimeUnit.MILLISECONDS);
+        canMessageBuilder = new CanMessageBuilder(rawMsgQueue, canMsgQueue);
+        msgQueueProcessorExecutor.scheduleWithFixedDelay(canMessageBuilder, 0, 1, TimeUnit.MILLISECONDS);
+        canMessagePrinterExecutor.scheduleWithFixedDelay(new CanMessageManager(canMsgQueue), 0, 250, TimeUnit.MILLISECONDS);
+
+        DataHolder.getInstance().setSerialConsoleActivity(this);
     }
 
     private void initRawCanButton() {
@@ -182,8 +184,8 @@ public class SerialConsoleActivity extends Activity {
             @Override
             public void onClick(View v) {
                 mClearButton.callOnClick();
-                canMessageProcessor.reset();
-                canMessageProcessor.setWaitingForSyncAck(true);
+                canMessageBuilder.reset();
+                canMessageBuilder.setWaitingForSyncAck(true);
                 if (mSerialIoManager == null) {
                     mStartButton.callOnClick();
                 }

@@ -57,6 +57,14 @@ public class CanMessageTemplateDB {
         }
     }
 
+    public static CanMessageTemplate getTemplate(byte[] canMessageId){
+        return templates.get(HexDump.toHexString(canMessageId));
+    }
+
+    public static CanMessageTemplate getTemplate(String canMessageId){
+        return templates.get(canMessageId);
+    }
+
     private static void parseXML(XmlPullParser parser) throws XmlPullParserException, IOException {
         int eventType = parser.getEventType();
         CanMessageTemplate template = null;
@@ -73,13 +81,24 @@ public class CanMessageTemplateDB {
                         String name = parser.getAttributeValue("", "name");
                         String description = parser.getAttributeValue("", "description");
                         String id = parser.getAttributeValue("", "id");
-                        template = new CanMessageTemplate(HexDump.hexStringToByteArray(id), name, description);
+                        String processorClass = parser.getAttributeValue("", "class");
+
+                        if (id.equals(CanConstants.ALL_MESSAGES)) {
+                            template = new CanMessageTemplate(null, name, description, processorClass);
+                        } else {
+                            template = new CanMessageTemplate(HexDump.hexStringToByteArray(id), name, description, processorClass);
+                        }
                     }
                     break;
                 case XmlPullParser.END_TAG:
                     tagName = parser.getName();
                     if (tagName.equals("message") && template != null) {
-                        templates.put(template.getName(), template);
+                        byte[] id = template.getId();
+                        if (id != null) {
+                            templates.put(HexDump.toHexString(id), template);
+                        } else {
+                            templates.put(CanConstants.ALL_MESSAGES, template);
+                        }
                     }
             }
             eventType = parser.next();

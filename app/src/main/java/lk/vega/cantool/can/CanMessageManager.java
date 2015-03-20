@@ -18,28 +18,33 @@ package lk.vega.cantool.can;
 
 import java.util.Queue;
 
-import lk.vega.cantool.SerialConsoleActivity;
-
 /**
- * Prints CAN messages to the screen
+ * TODO: Class comments
  */
-public class CanMessagePrinter implements Runnable {
-    private Queue<CanMessage> canMsgQueue;
-    private SerialConsoleActivity serialConsoleActivity;
+public class CanMessageManager implements Runnable {
+    private final Queue<CanMessage> canMsgQueue;
 
-    public CanMessagePrinter(Queue<CanMessage> canMsgQueue, SerialConsoleActivity serialConsoleActivity) {
+    public CanMessageManager(Queue<CanMessage> canMsgQueue) {
         this.canMsgQueue = canMsgQueue;
-        this.serialConsoleActivity = serialConsoleActivity;
+    }
+
+    public void messageReceived(CanMessage canMessage) {
+        CanMessageTemplate template = CanMessageTemplateDB.getTemplate(canMessage.getMessageId());
+        if(template != null){
+            template.getProcessor().process(canMessage);
+        }
+        CanMessageTemplate allMessagesTemplate = CanMessageTemplateDB.getTemplate(CanConstants.ALL_MESSAGES);
+        if(allMessagesTemplate != null){
+            allMessagesTemplate.getProcessor().process(canMessage);
+        }
     }
 
     @Override
     public void run() {
-        CanMessage canMessage = null;
-        do {
-            if (canMessage != null) {
-                serialConsoleActivity.printCanMessage(canMessage);
-            }
+        CanMessage canMessage = canMsgQueue.poll();
+        while (canMessage != null) {
+            messageReceived(canMessage);
             canMessage = canMsgQueue.poll();
-        } while (canMessage != null);
+        }
     }
 }

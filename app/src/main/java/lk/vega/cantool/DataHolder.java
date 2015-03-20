@@ -14,24 +14,29 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can;
+package lk.vega.cantool;
 
 /**
- * Constants
+ * TODO: Class comments
  */
-public class CanConstants {
+public class DataHolder {
+    private static final DataHolder instance = new DataHolder();
 
-    /**
-     * The message sent during handshaking
-     */
-//    public static final String CAN_SYNC = "DD";
-    public static final String CAN_SYNC = "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD";
+    private SerialConsoleActivity serialConsoleActivity;
 
+    private DataHolder(){
 
-    /**
-     * ACK for the CAN sync handshake message
-     */
-    public static final String CAN_SYNC_ACK = "DDDDDD";
+    }
 
-    public static final String ALL_MESSAGES = "*";
+    public static DataHolder getInstance(){
+        return instance;
+    }
+
+    public SerialConsoleActivity getSerialConsoleActivity() {
+        return serialConsoleActivity;
+    }
+
+    public void setSerialConsoleActivity(SerialConsoleActivity serialConsoleActivity) {
+        this.serialConsoleActivity = serialConsoleActivity;
+    }
 }

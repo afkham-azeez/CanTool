@@ -28,7 +28,7 @@ import static lk.vega.cantool.can.CanMessage.CAN_MSG_SIZE_BYTES;
  * <p/>
  * Not thread safe
  */
-public class CanMessageProcessor implements Runnable {
+public class CanMessageBuilder implements Runnable {
 
     private byte[] overflow;
 
@@ -41,22 +41,13 @@ public class CanMessageProcessor implements Runnable {
     private Queue<CanMessage> canMessageQueue;
     private boolean waitingForSyncAck;
 
-    public CanMessageProcessor(Queue<byte[]> rawMsgQueue, Queue<CanMessage> canMessageQueue) {
+    public CanMessageBuilder(Queue<byte[]> rawMsgQueue, Queue<CanMessage> canMessageQueue) {
         this.rawMsgQueue = rawMsgQueue;
         this.canMessageQueue = canMessageQueue;
     }
 
     @Override
     public void run() {
-        /*byte[] content = new byte[]{0x01, 0x34, 0x56, 0x78, 0x09, (byte) 0xAB, (byte) 0xEF, (byte) 0xCA, (byte) 0xBC, 0x12};
-        canMessageQueue.add(new CanMessage(content));
-
-        content = new byte[]{0x01, 0x35, 0x56, 0x78, 0x09, (byte) 0xAB, (byte) 0xEF, (byte) 0xCA, (byte) 0xBC, 0x13};
-        canMessageQueue.add(new CanMessage(content));
-
-        content = new byte[]{0x01, 0x36, 0x56, 0x78, 0x09, (byte) 0xAB, (byte) 0xEF, (byte) 0xCA, (byte) 0xBC, 0x14};
-        canMessageQueue.add(new CanMessage(content));*/
-
         byte[] rawMsg = null;
         do {
             if (rawMsg != null) {

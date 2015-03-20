@@ -16,6 +16,10 @@
  */
 package lk.vega.cantool.can;
 
+import android.util.Log;
+
+import lk.vega.cantool.can.messages.CanMessageProcessor;
+
 /**
  * TODO: Class comments
  */
@@ -24,14 +28,22 @@ public class CanMessageTemplate {
     private byte[] id;
     private String name;
     private String description;
+    private CanMessageProcessor processor;
 
     public CanMessageTemplate() {
     }
 
-    public CanMessageTemplate(byte[] id, String name, String description) {
+    public CanMessageTemplate(byte[] id, String name, String description, String processorClass) {
         this.id = id;
         this.name = name;
         this.description = description;
+        try {
+            processor = (CanMessageProcessor) Class.forName(processorClass).newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            String msg = "Could not instantiate CanMessageProcessor class " + processorClass;
+            Log.e(CanMessageTemplate.class.getSimpleName(), msg);
+            throw new RuntimeException(msg, e);
+        }
     }
 
     public byte[] getId() {
@@ -44,5 +56,9 @@ public class CanMessageTemplate {
 
     public String getDescription() {
         return description;
+    }
+
+    public CanMessageProcessor getProcessor() {
+        return processor;
     }
 }

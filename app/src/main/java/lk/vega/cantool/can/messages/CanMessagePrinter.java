@@ -14,24 +14,18 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can;
+package lk.vega.cantool.can.messages;
+
+import lk.vega.cantool.DataHolder;
+import lk.vega.cantool.can.CanMessage;
 
 /**
- * Constants
+ * Prints CAN messages to the screen
  */
-public class CanConstants {
+public class CanMessagePrinter implements CanMessageProcessor {
 
-    /**
-     * The message sent during handshaking
-     */
-//    public static final String CAN_SYNC = "DD";
-    public static final String CAN_SYNC = "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD";
-
-
-    /**
-     * ACK for the CAN sync handshake message
-     */
-    public static final String CAN_SYNC_ACK = "DDDDDD";
-
-    public static final String ALL_MESSAGES = "*";
+    @Override
+    public void process(CanMessage canMessage) {
+        DataHolder.getInstance().getSerialConsoleActivity().printCanMessage(canMessage);
+    }
 }

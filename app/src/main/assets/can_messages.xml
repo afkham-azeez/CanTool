@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <canMessages>
-    <message name="headlamp_control" description="Switches the headlamp on and off" id="0x0A"/>
-    <message name="brakes" description="Switches the headlamp on and off" id="0x0B"/>
+    <message name="headlamp_control" description="Switches the headlamp on and off" id="0A"
+             class="lk.vega.cantool.can.messages.HeadlampControlMsgProcessor"/>
+
+    <message name="brakes" description="Brake controls" id="0B"
+        class="lk.vega.cantool.can.messages.BrakeControlMsgProcessor"/>
+
+    <message name="all" description="All messages" id="*"
+             class="lk.vega.cantool.can.messages.CanMessagePrinter"/>
 </canMessages>
