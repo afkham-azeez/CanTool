@@ -14,13 +14,12 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can.messages.evms_to_acc.head_lamp;
-
-import lk.vega.cantool.can.SwitchState;
+package lk.vega.cantool.can.messages.evms_to_acc.tail_light;
 
 /**
  * TODO: Class comments
  */
-public class LeftHeadlampSwitch {
-    private SwitchState state = SwitchState.OFF;
+public class SetTailLightState {
+
+    // off, park, pattern
 }

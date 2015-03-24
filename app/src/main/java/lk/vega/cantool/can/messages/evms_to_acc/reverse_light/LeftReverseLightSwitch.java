@@ -16,8 +16,11 @@
  */
 package lk.vega.cantool.can.messages.evms_to_acc.reverse_light;
 
+import lk.vega.cantool.can.SwitchState;
+
 /**
  * TODO: Class comments
  */
 public class LeftReverseLightSwitch {
+    private SwitchState state = SwitchState.OFF;
 }

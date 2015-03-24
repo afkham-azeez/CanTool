@@ -18,7 +18,8 @@ package lk.vega.cantool.can;
 
 import android.util.Log;
 
-import lk.vega.cantool.can.messages.CanMessageProcessor;
+import lk.vega.cantool.can.messages.CanMessageBroker;
+import lk.vega.usbserial.util.SerialInputOutputManager;
 
 /**
  * Represents the template for a CAN message
@@ -28,7 +29,7 @@ public class CanMessageTemplate {
     private byte[] id;
     private String name;
     private String description;
-    private CanMessageProcessor processor;
+    private CanMessageBroker broker;
 
     public CanMessageTemplate() {
     }
@@ -38,9 +39,9 @@ public class CanMessageTemplate {
         this.name = name;
         this.description = description;
         try {
-            processor = (CanMessageProcessor) Class.forName(processorClass).newInstance();
+            broker = (CanMessageBroker) Class.forName(processorClass).newInstance();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            String msg = "Could not instantiate CanMessageProcessor class " + processorClass;
+            String msg = "Could not instantiate CanMessageBroker class " + processorClass;
             Log.e(CanMessageTemplate.class.getSimpleName(), msg);
             throw new RuntimeException(msg, e);
         }
@@ -58,7 +59,11 @@ public class CanMessageTemplate {
         return description;
     }
 
-    public CanMessageProcessor getProcessor() {
-        return processor;
+    public CanMessageBroker getBroker() {
+        return broker;
+    }
+
+    public void setSerialIoManager(SerialInputOutputManager serialIoManager) {
+        broker.setSerialIoManager(serialIoManager);
     }
 }

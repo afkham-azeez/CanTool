@@ -14,13 +14,13 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can.messages.evms_to_acc.head_lamp;
+package lk.vega.cantool.can.messages.evms_to_acc.signal_light;
 
 import lk.vega.cantool.can.SwitchState;
 
 /**
  * TODO: Class comments
  */
-public class LeftHeadlampSwitch {
+public class FrontLeftSignalLightSwitch {
     private SwitchState state = SwitchState.OFF;
 }

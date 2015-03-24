@@ -16,8 +16,11 @@
  */
 package lk.vega.cantool.can.messages.evms_to_acc.shutter;
 
+import lk.vega.cantool.can.SwitchState;
+
 /**
  * TODO: Class comments
  */
 public class RightShutterMotorSwitch {
+    private SwitchState state = SwitchState.OFF;
 }

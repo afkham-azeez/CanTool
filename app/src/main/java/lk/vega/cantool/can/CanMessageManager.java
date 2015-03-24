@@ -31,14 +31,14 @@ public class CanMessageManager implements Runnable {
     public void messageReceived(CanMessage canMessage) {
         CanMessageTemplate template = CanMessageTemplateDB.getTemplate(canMessage.getMessageId());
         if(template != null){
-            template.getProcessor().process(canMessage);
+            template.getBroker().messageReceived(canMessage);
         }
 
-        // If there is a CanMessageProcessor that is interested in handling all CAN messages, then we dispatch to
+        // If there is a CanMessageBroker that is interested in handling all CAN messages, then we dispatch to
         // such a processor as well
         CanMessageTemplate allMessagesTemplate = CanMessageTemplateDB.getTemplate(CanConstants.ALL_MESSAGES);
         if(allMessagesTemplate != null){
-            allMessagesTemplate.getProcessor().process(canMessage);
+            allMessagesTemplate.getBroker().messageReceived(canMessage);
         }
     }
 

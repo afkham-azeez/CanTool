@@ -14,16 +14,13 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can.messages;
+package lk.vega.cantool.can.messages.evms_to_acc.head_lamp;
 
-import lk.vega.cantool.can.CanMessage;
+import lk.vega.cantool.can.SwitchState;
 
 /**
  * TODO: Class comments
  */
-public class HeadlampControlMsgProcessor implements CanMessageProcessor {
-    @Override
-    public void process(CanMessage canMessage) {
-
-    }
+public class RightHeadLampSwitch {
+    private SwitchState state = SwitchState.OFF;
 }

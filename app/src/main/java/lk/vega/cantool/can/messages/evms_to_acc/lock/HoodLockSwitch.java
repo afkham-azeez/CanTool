@@ -16,8 +16,11 @@
  */
 package lk.vega.cantool.can.messages.evms_to_acc.lock;
 
+import lk.vega.cantool.can.SwitchState;
+
 /**
  * TODO: Class comments
  */
 public class HoodLockSwitch {
+    private SwitchState state = SwitchState.OFF;
 }

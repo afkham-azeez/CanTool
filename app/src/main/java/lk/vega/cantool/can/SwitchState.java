@@ -14,13 +14,21 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can.messages.evms_to_acc.head_lamp;
-
-import lk.vega.cantool.can.SwitchState;
+package lk.vega.cantool.can;
 
 /**
  * TODO: Class comments
  */
-public class LeftHeadlampSwitch {
-    private SwitchState state = SwitchState.OFF;
+public enum SwitchState {
+    ON(true), OFF(false);
+
+    private boolean isSwitchedOn;
+
+    SwitchState(boolean isSwitchedOn) {
+        this.isSwitchedOn = isSwitchedOn;
+    }
+
+    public boolean isSwitchedOn() {
+        return isSwitchedOn;
+    }
 }

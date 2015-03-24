@@ -14,14 +14,13 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can.messages;
+package lk.vega.cantool.can.messages.evms_to_acc.signal_light;
 
-import lk.vega.cantool.can.CanMessage;
+import lk.vega.cantool.can.SwitchState;
 
 /**
  * TODO: Class comments
  */
-public interface CanMessageProcessor {
-
-    void process(CanMessage canMessage);
+public class RearRightSignalLightSwitch {
+    private SwitchState state = SwitchState.OFF;
 }

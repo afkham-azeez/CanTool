@@ -14,18 +14,13 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can.messages;
+package lk.vega.cantool.can.messages.evms_to_acc.signal_light;
 
-import lk.vega.cantool.DataHolder;
-import lk.vega.cantool.can.CanMessage;
+import lk.vega.cantool.can.SwitchState;
 
 /**
- * Prints CAN messages to the screen
+ * TODO: Class comments
  */
-public class CanMessagePrinter implements CanMessageProcessor {
-
-    @Override
-    public void process(CanMessage canMessage) {
-        DataHolder.getInstance().getSerialConsoleActivity().printCanMessage(canMessage);
-    }
+public class FrontRightSignalLightSwitch {
+    private SwitchState state = SwitchState.OFF;
 }

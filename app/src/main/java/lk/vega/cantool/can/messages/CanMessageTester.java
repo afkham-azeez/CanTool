@@ -16,14 +16,16 @@
  */
 package lk.vega.cantool.can.messages;
 
+import lk.vega.cantool.DataHolder;
 import lk.vega.cantool.can.CanMessage;
 
 /**
- * TODO: Class comments
+ * Prints CAN messages to the screen
  */
-public class BrakeControlMsgProcessor implements CanMessageProcessor {
-    @Override
-    public void process(CanMessage canMessage) {
+public class CanMessageTester extends CanMessageBroker {
 
+    @Override
+    public void messageReceived(CanMessage canMessage) {
+        DataHolder.getInstance().getSerialConsoleActivity().printCanMessage(canMessage);
     }
 }

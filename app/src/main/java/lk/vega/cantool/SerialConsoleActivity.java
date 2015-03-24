@@ -54,8 +54,9 @@ import java.util.concurrent.TimeUnit;
 import lk.vega.cantool.can.CanMessage;
 import lk.vega.cantool.can.CanMessageBuilder;
 import lk.vega.cantool.can.CanMessageManager;
-import lk.vega.cantool.can.messages.CanMessagePrinter;
 import lk.vega.cantool.can.CanConstants;
+import lk.vega.cantool.can.CanMessageTemplate;
+import lk.vega.cantool.can.CanMessageTemplateDB;
 import lk.vega.usbserial.driver.UsbSerialPort;
 import lk.vega.usbserial.util.HexDump;
 import lk.vega.usbserial.util.SerialInputOutputManager;
@@ -204,7 +205,12 @@ public class SerialConsoleActivity extends Activity {
                     if (mSerialIoManager == null) {
                         mStartButton.callOnClick();
                     }
-                    mSerialIoManager.writeAsync(HexDump.hexStringToByteArray(canMsg));
+                    // Call CanMessageTester.sendMessage
+                    CanMessageTemplate allMessagesTemplate = CanMessageTemplateDB.getTemplate(CanConstants.ALL_MESSAGES);
+                    if(allMessagesTemplate != null){
+                        allMessagesTemplate.getBroker().sendMessage(new CanMessage(HexDump.hexStringToByteArray(canMsg)));
+                    }
+
                     Toast.makeText(getBaseContext(), "CAN message [" + canMsg + "] sent", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getBaseContext(),
@@ -359,6 +365,7 @@ public class SerialConsoleActivity extends Activity {
         if (sPort != null) {
             Log.i(TAG, "Starting io manager ..");
             mSerialIoManager = new SerialInputOutputManager(sPort, mListener);
+            CanMessageTemplateDB.setSerialIoManager(mSerialIoManager);
             serialIoExecutor.submit(mSerialIoManager);
         }
     }

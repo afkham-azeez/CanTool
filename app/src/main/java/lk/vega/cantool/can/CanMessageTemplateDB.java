@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lk.vega.usbserial.util.HexDump;
+import lk.vega.usbserial.util.SerialInputOutputManager;
 
 /**
  * This class loads all the CAN message types that are supported by the system & is used as a central DB for keeping
@@ -36,6 +37,7 @@ import lk.vega.usbserial.util.HexDump;
  */
 public class CanMessageTemplateDB {
 
+    public static final String HANDLER = "handler";
     /**
      * key - CAN message ID
      */
@@ -78,7 +80,7 @@ public class CanMessageTemplateDB {
                     break;
                 case XmlPullParser.START_TAG:
                     tagName = parser.getName();
-                    if (tagName.equals("message")) {
+                    if (tagName.equals(HANDLER)) {
                         String name = parser.getAttributeValue("", "name");
                         String description = parser.getAttributeValue("", "description");
                         String id = parser.getAttributeValue("", "id");
@@ -93,7 +95,7 @@ public class CanMessageTemplateDB {
                     break;
                 case XmlPullParser.END_TAG:
                     tagName = parser.getName();
-                    if (tagName.equals("message") && template != null) {
+                    if (tagName.equals(HANDLER) && template != null) {
                         byte[] id = template.getId();
                         if (id != null) {
                             templates.put(HexDump.toHexString(id), template);
@@ -103,6 +105,12 @@ public class CanMessageTemplateDB {
                     }
             }
             eventType = parser.next();
+        }
+    }
+
+    public static void setSerialIoManager(SerialInputOutputManager serialIoManager) {
+        for (CanMessageTemplate template : templates.values()) {
+            template.setSerialIoManager(serialIoManager);
         }
     }
 }

@@ -16,8 +16,19 @@
  */
 package lk.vega.cantool.can.messages.evms_to_acc.cabin;
 
+import lk.vega.cantool.can.CanMessage;
+import lk.vega.cantool.can.SwitchState;
+import lk.vega.cantool.can.messages.CanMessageBroker;
+
 /**
  * TODO: Class comments
  */
-public class CabinLightSwitch {
+public class CabinLightSwitch extends CanMessageBroker {
+
+    private SwitchState state = SwitchState.OFF;
+
+    @Override
+    public void messageReceived(CanMessage canMessage) {
+
+    }
 }

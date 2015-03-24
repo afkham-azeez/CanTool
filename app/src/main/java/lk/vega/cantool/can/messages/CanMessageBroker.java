@@ -14,13 +14,27 @@
  * Contributors:
  *     Afkham Azeez (afkham@gmail.com)
  */
-package lk.vega.cantool.can.messages.evms_to_acc.head_lamp;
+package lk.vega.cantool.can.messages;
 
-import lk.vega.cantool.can.SwitchState;
+import lk.vega.cantool.can.CanMessage;
+import lk.vega.usbserial.util.SerialInputOutputManager;
 
 /**
  * TODO: Class comments
  */
-public class LeftHeadlampSwitch {
-    private SwitchState state = SwitchState.OFF;
+public abstract class CanMessageBroker {
+
+    private SerialInputOutputManager serialIoManager;
+
+    public abstract void messageReceived(CanMessage canMessage);
+
+    public void sendMessage(CanMessage canMessage){
+        if (serialIoManager != null) {
+            serialIoManager.writeAsync(canMessage.getRaw());
+        }
+    }
+
+    public void setSerialIoManager(SerialInputOutputManager serialIoManager){
+        this.serialIoManager = serialIoManager;
+    }
 }

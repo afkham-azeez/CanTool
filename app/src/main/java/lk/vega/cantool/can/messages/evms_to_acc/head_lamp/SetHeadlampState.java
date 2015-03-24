@@ -16,11 +16,10 @@
  */
 package lk.vega.cantool.can.messages.evms_to_acc.head_lamp;
 
-import lk.vega.cantool.can.SwitchState;
-
 /**
  * TODO: Class comments
  */
-public class LeftHeadlampSwitch {
-    private SwitchState state = SwitchState.OFF;
+public class SetHeadlampState {
+
+    // off, parking, low, high
 }
